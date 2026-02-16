@@ -1,0 +1,127 @@
+/* LoginManager – Login Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --lm-primary: #6366f1;
+    --lm-danger:  #ef4444;
+}
+
+#login {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Attempt warning badge */
+.loginmanager-attempts {
+    display: inline-block;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #c2410c;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* Lockout banner */
+.loginmanager-lockout-bar {
+    background: linear-gradient(135deg, #fef2f2, #fff5f5);
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    text-align: center;
+    animation: lm-shake .4s ease;
+}
+.loginmanager-lockout-bar__icon {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 4px;
+}
+.loginmanager-lockout-bar__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #991b1b;
+    display: block;
+}
+.loginmanager-lockout-bar__msg {
+    font-size: 12px;
+    color: #b91c1c;
+    display: block;
+    margin-top: 2px;
+}
+
+/* Countdown timer */
+.loginmanager-timer {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--lm-primary);
+    display: block;
+    margin-top: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Progress bar for remaining attempts */
+.lm-attempt-progress {
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    margin: 10px 0 0;
+    overflow: hidden;
+}
+.lm-attempt-progress__bar {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--lm-primary);
+    transition: width .4s ease, background .3s;
+}
+
+@keyframes lm-shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60%  { transform: translateX(-6px); }
+    40%, 80%  { transform: translateX(6px); }
+}
+
+/* assets/css/login.css — add/replace */
+
+/* ---- Segmented Attempt Blocks ---- */
+.lm-attempt-blocks {
+    display: flex;
+    gap: 5px;
+    margin: 14px 0 4px;
+    align-items: center;
+}
+.lm-attempt-blocks__segment {
+    flex: 1;
+    height: 6px;
+    border-radius: 20px;
+    background: #e5e7eb;
+    transition: background .35s cubic-bezier(.4,0,.2,1),
+                transform .2s ease;
+}
+.lm-attempt-blocks__segment.is-used {
+    background: var(--lm-primary);
+    transform: scaleY(1.15);
+}
+.lm-attempt-blocks__segment.is-warn {
+    background: #f59e0b;
+    transform: scaleY(1.25);
+}
+.lm-attempt-blocks__segment.is-danger {
+    background: #ef4444;
+    transform: scaleY(1.35);
+    animation: lm-pulse-seg 1.2s ease-in-out infinite;
+}
+.lm-attempt-blocks__label {
+    font-size: 11px;
+    color: #9ca3af;
+    font-weight: 500;
+    margin-top: 5px;
+    text-align: right;
+    display: block;
+}
+
+@keyframes lm-pulse-seg {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .55; }
+}

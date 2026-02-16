@@ -1,0 +1,17 @@
+{
+    "name": "yourname/login-manager",
+    "description": "WordPress plugin to limit login attempts and protect against brute force attacks.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "LoginManager\\": "includes/"
+        }
+    },
+    "require": {
+        "php": ">=7.4"
+    },
+    "scripts": {
+        "post-install-cmd": []
+    }
+}
