@@ -4,17 +4,53 @@
 ( function ( $ ) {
     'use strict';
 
-    var data = window.LoginManagerData || { remaining: 5, locked: false, lockTime: 0 };
+    var data = window.LoginManagerData || {
+        remaining: 5,
+        max: 5,
+        locked: false,
+        lockTime: 0,
+        showCaptcha: false
+    };
 
     $( document ).ready( function () {
         injectUI();
+
         if ( data.locked ) {
             startCountdown( data.lockTime );
+            $( '#wp-submit' ).prop( 'disabled', true ).css( 'opacity', '.5' );
         }
+
+        // Shake captcha on wrong answer (WP error contains our key).
+        if ( $( '.lm-captcha-wrap' ).length && $( '#login_error' ).length ) {
+            $( '.lm-captcha-wrap' ).addClass( 'is-wrong' );
+            // Focus the captcha input.
+            setTimeout( function () {
+                $( '#lm_captcha_answer' ).val( '' ).focus();
+            }, 100 );
+        }
+
+        // Auto-focus captcha input if visible.
+        if ( data.showCaptcha && ! data.locked ) {
+            setTimeout( function () {
+                $( '#lm_captcha_answer' ).focus();
+            }, 200 );
+        }
+
+        // Prevent form submit if captcha shown but empty.
+        $( '#loginform' ).on( 'submit', function ( e ) {
+            if ( ! $( '#lm_captcha_answer' ).length ) return;
+
+            var answer = $.trim( $( '#lm_captcha_answer' ).val() );
+            if ( '' === answer ) {
+                e.preventDefault();
+                $( '.lm-captcha-wrap' ).addClass( 'is-wrong' );
+                $( '#lm_captcha_answer' ).focus();
+            }
+        } );
     } );
 
     /**
-     * Inject UI elements into the login form.
+     * Inject attempt progress UI.
      */
     function injectUI() {
         if ( data.locked ) {
@@ -27,31 +63,50 @@
                 '</div>'
             ].join( '' );
             $( '#loginform' ).prepend( bar );
-            $( '#wp-submit' ).prop( 'disabled', true ).css( 'opacity', '.5' );
-        } else if ( data.remaining > 0 ) {
-            var pct   = ( data.remaining / 5 ) * 100;
-            var color = pct > 60 ? '#6366f1' : pct > 30 ? '#f59e0b' : '#ef4444';
-            var prog  = [
-                '<div class="lm-attempt-progress">',
-                '  <div class="lm-attempt-progress__bar" style="width:' + pct + '%;background:' + color + '"></div>',
-                '</div>'
-            ].join( '' );
-            $( '#loginform' ).append( prog );
+            return;
+        }
+
+        if ( data.remaining > 0 && data.remaining < data.max ) {
+            $( '#loginform' ).append( renderAttemptBlocks( data.remaining, data.max ) );
         }
     }
 
     /**
-     * Start a visual countdown timer.
-     *
-     * @param {number} minutes - Minutes remaining.
+     * Render segmented attempt blocks.
+     */
+    function renderAttemptBlocks( remaining, max ) {
+        var used     = max - remaining;
+        var segments = '';
+
+        for ( var i = 0; i < max; i++ ) {
+            var cls = 'lm-attempt-blocks__segment';
+            if ( i < used ) {
+                if ( remaining <= 1 )      cls += ' is-danger';
+                else if ( remaining <= 2 ) cls += ' is-warn';
+                else                       cls += ' is-used';
+            }
+            segments += '<div class="' + cls + '"></div>';
+        }
+
+        var labelColor = remaining <= 1 ? '#ef4444' : ( remaining <= 2 ? '#f59e0b' : '#6b7280' );
+        var labelText  = remaining === 1
+            ? '⚠ Last attempt before lockout!'
+            : remaining + ' of ' + max + ' attempts remaining';
+
+        return '<div class="lm-attempt-blocks">' + segments + '</div>' +
+               '<span class="lm-attempt-blocks__label" style="color:' + labelColor + '">' + labelText + '</span>';
+    }
+
+    /**
+     * Countdown timer.
      */
     function startCountdown( minutes ) {
         var totalSeconds = minutes * 60;
 
         function tick() {
             if ( totalSeconds <= 0 ) {
-                $( '#lm-timer' ).text( '' );
-                $( '#wp-submit' ).prop( 'disabled', false ).css( 'opacity', '1' );
+                $( '#lm-timer' ).text( 'Refreshing...' );
+                window.location.reload();
                 return;
             }
             var m = Math.floor( totalSeconds / 60 );
@@ -90,3 +145,4 @@ function renderAttemptBlocks( remaining, max ) {
 
     return '<div class="lm-attempt-blocks">' + segments + '</div>' + label;
 }
+

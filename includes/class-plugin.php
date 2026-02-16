@@ -45,9 +45,7 @@ class Plugin {
         ( new Admin() )->register();
 
         // Show setup wizard on first activation.
-        if ( get_option( 'loginmanager_show_wizard', false ) ) {
-            ( new Setup_Wizard() )->register();
-        }
+        ( new Setup_Wizard() )->register();
     }
 
     /**

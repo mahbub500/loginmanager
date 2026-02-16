@@ -25,8 +25,7 @@ class Activator {
         Database::create_tables();
         self::set_default_options();
         // Flag to show setup wizard.
-        update_option( 'loginmanager_show_wizard', true );
-        update_option( 'loginmanager_wizard_step', 1 );
+        set_transient( 'loginmanager_activation_redirect', true, 30 );
     }
 
     /**

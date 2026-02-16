@@ -125,3 +125,98 @@
     0%, 100% { opacity: 1; }
     50%       { opacity: .55; }
 }
+
+/* ---- Math Captcha ---- */
+.lm-captcha-wrap {
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+    border: 1.5px solid #c7d2fe;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 16px 0;
+    animation: lm-fadein .35s ease both;
+}
+
+.lm-captcha-label {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #4338ca !important;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 10px !important;
+}
+
+.lm-captcha-icon {
+    font-size: 14px;
+}
+
+.lm-captcha-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lm-captcha-question {
+    background: white;
+    border: 1.5px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 17px;
+    font-weight: 700;
+    color: #3730a3;
+    white-space: nowrap;
+    letter-spacing: .03em;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(99,102,241,.1);
+}
+
+.lm-captcha-input {
+    flex: 1;
+    border: 1.5px solid #c7d2fe !important;
+    background: white !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    color: #3730a3 !important;
+    text-align: center;
+    padding: 10px 12px !important;
+    transition: all .2s ease !important;
+    /* Remove number arrows */
+    -moz-appearance: textfield;
+}
+.lm-captcha-input::-webkit-outer-spin-button,
+.lm-captcha-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.lm-captcha-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.15) !important;
+    outline: none !important;
+}
+
+.lm-captcha-hint {
+    display: block;
+    font-size: 11px;
+    color: #818cf8;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Shake on wrong answer */
+.lm-captcha-wrap.is-wrong {
+    animation: lm-shake .4s ease;
+    border-color: #fca5a5;
+    background: linear-gradient(135deg, #fef2f2, #fff5f5);
+}
+.lm-captcha-wrap.is-wrong .lm-captcha-question {
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+
+@keyframes lm-fadein {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

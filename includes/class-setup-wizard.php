@@ -53,12 +53,14 @@ class Setup_Wizard {
      * Register hidden wizard admin page.
      */
     public function register_wizard_page(): void {
-        add_dashboard_page(
+        add_menu_page(
             __( 'LoginManager Setup', 'login-manager' ),
             __( 'LoginManager Setup', 'login-manager' ),
             'manage_options',
             'loginmanager-wizard',
-            [ $this, 'render_wizard' ]
+            [ $this, 'render_wizard' ],
+            'none',
+            3
         );
     }
 
@@ -66,21 +68,25 @@ class Setup_Wizard {
      * Redirect to wizard after activation.
      */
     public function maybe_redirect_to_wizard(): void {
-        if ( ! get_option( 'loginmanager_show_wizard', false ) ) {
+
+        // Only redirect if transient is set (set during activation).
+        if ( ! get_transient( 'loginmanager_activation_redirect' ) ) {
             return;
         }
 
+        // Don't redirect if already on wizard page.
         // phpcs:ignore WordPress.Security.NonceVerification
         if ( isset( $_GET['page'] ) && 'loginmanager-wizard' === $_GET['page'] ) {
+            delete_transient( 'loginmanager_activation_redirect' );
             return;
         }
 
-        if ( wp_doing_ajax() ) {
+        if ( wp_doing_ajax() || is_network_admin() ) {
             return;
         }
 
-        update_option( 'loginmanager_show_wizard', false );
-        wp_safe_redirect( admin_url( 'index.php?page=loginmanager-wizard' ) );
+        delete_transient( 'loginmanager_activation_redirect' );
+        wp_safe_redirect( admin_url( 'admin.php?page=loginmanager-wizard' ) );
         exit;
     }
 
@@ -90,7 +96,8 @@ class Setup_Wizard {
      * @param string $hook Current page hook.
      */
     public function enqueue_wizard_assets( string $hook ): void {
-        if ( 'dashboard_page_loginmanager-wizard' !== $hook ) {
+        if ( 'dashboard_page_loginmanager-wizard' !== $hook && 
+             'toplevel_page_loginmanager-wizard' !== $hook ) {
             return;
         }
 
@@ -142,13 +149,17 @@ class Setup_Wizard {
                 update_option( 'loginmanager_notify_email', $email );
                 // Mark wizard complete.
                 update_option( 'loginmanager_wizard_step', 0 );
-                wp_safe_redirect( admin_url( 'index.php?page=loginmanager-wizard&step=complete' ) );
+                wp_safe_redirect( admin_url( 'admin.php?page=loginmanager-wizard&step=complete' ) );
                 exit;
         }
 
         $next_step = $step + 1;
         update_option( 'loginmanager_wizard_step', $next_step );
-        wp_safe_redirect( admin_url( 'index.php?page=loginmanager-wizard&step=' . $next_step ) );
+        // After step 3 complete:
+        wp_safe_redirect( admin_url( 'admin.php?page=loginmanager-wizard&step=complete' ) );
+
+        // After other steps:
+        wp_safe_redirect( admin_url( 'admin.php?page=loginmanager-wizard&step=' . $next_step ) );
         exit;
     }
 
